@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.entities.Book;
+import com.example.demo.repository.BookRepository;
 import com.example.demo.service.BookService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,15 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
+    @Autowired
+    private BookRepository bookRepository;
 
     @GetMapping
     public List<Book> getAllBooks() {
         return bookService.findAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("single/{id}")
     public Book getBook(@PathVariable Long id) {
         return bookService.findById(id);
     }
@@ -35,6 +38,12 @@ public class BookController {
     public Book updateBook(@PathVariable Long id, @RequestBody Book book) {
         // Additional logic to ensure you're updating the correct book
         return bookService.save(book);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Book>> searchBooksByTitle(@RequestParam("title") String title) {
+        List<Book> books = bookRepository.findByTitleContainingIgnoreCase(title);
+        return ResponseEntity.ok(books);
     }
 
     @DeleteMapping("/{id}")
